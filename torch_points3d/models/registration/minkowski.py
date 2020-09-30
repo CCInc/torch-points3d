@@ -49,11 +49,11 @@ class BaseMinkowski(FragmentBaseModel):
 
     def set_input(self, data, device):
         coords = torch.cat([data.batch.unsqueeze(-1).int(), data.coords.int()], -1)
-        self.input = ME.SparseTensor(data.x, coords=coords).to(device)
+        self.input = ME.SparseTensor(data.x.to(device), coords=coords.to(device))
         self.xyz = data.pos.to(device)
         if hasattr(data, "pos_target"):
             coords_target = torch.cat([data.batch_target.unsqueeze(-1).int(), data.coords_target.int()], -1)
-            self.input_target = ME.SparseTensor(data.x_target, coords=coords_target).to(device)
+            self.input_target = ME.SparseTensor(data.x_target.to(device), coords=coords_target.to(device))
             self.xyz_target = data.pos_target.to(device)
             self.match = data.pair_ind.to(torch.long).to(device)
             self.size_match = data.size_pair_ind.to(torch.long).to(device)
