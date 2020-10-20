@@ -13,7 +13,8 @@ from torch_geometric.data import DataLoader
 from torch_geometric.datasets import S3DIS as S3DIS1x1
 import torch_geometric.transforms as T
 import logging
-from sklearn.neighbors import NearestNeighbors, KDTree
+from sklearn.neighbors import NearestNeighbors
+from scipy.spatial import cKDTree
 from tqdm.auto import tqdm as tq
 import csv
 import pandas as pd
@@ -559,7 +560,7 @@ class S3DISSphere(S3DISOriginalFused):
                 centres[:, 3] = i
                 centres[:, 4] = low_res.y
                 self._centres_for_sampling.append(centres)
-                tree = KDTree(np.asarray(data.pos), leaf_size=10)
+                tree = cKDTree(np.asarray(data.pos), leafsize=10)
                 setattr(data, cT.SphereSampling.KDTREE_KEY, tree)
 
             self._centres_for_sampling = torch.cat(self._centres_for_sampling, 0)
@@ -599,7 +600,7 @@ class S3DISCylinder(S3DISSphere):
                 centres[:, 3] = i
                 centres[:, 4] = low_res.y
                 self._centres_for_sampling.append(centres)
-                tree = KDTree(np.asarray(data.pos[:, :-1]), leaf_size=10)
+                tree = cKDTree(np.asarray(data.pos[:, :-1]), leafsize=10)
                 setattr(data, cT.CylinderSampling.KDTREE_KEY, tree)
 
             self._centres_for_sampling = torch.cat(self._centres_for_sampling, 0)

@@ -6,7 +6,7 @@ import re
 import torch
 import random
 from tqdm.auto import tqdm as tq
-from sklearn.neighbors import KDTree
+from scipy.spatial import cKDTree
 from functools import partial
 from torch.nn import functional as F
 from torch_geometric.nn.pool.pool import pool_pos, pool_batch
@@ -113,7 +113,7 @@ class GridSphereSampling(object):
 
     def _process(self, data):
         if not hasattr(data, self.KDTREE_KEY):
-            tree = KDTree(np.asarray(data.pos), leaf_size=50)
+            tree = cKDTree(np.asarray(data.pos), leafsize=50)
         else:
             tree = getattr(data, self.KDTREE_KEY)
 
@@ -134,7 +134,7 @@ class GridSphereSampling(object):
             grid_label = data.y[ind]
 
             # Find neighbours within the original data
-            ind = torch.LongTensor(tree.query_radius(pts, r=self._radius)[0])
+            ind = torch.LongTensor(tree.query_ball_point(pts, r=self._radius)[0])
             sampler = SphereSampling(self._radius, grid_center, align_origin=self._center)
             new_data = sampler(data)
             new_data.center_label = grid_label
@@ -180,7 +180,7 @@ class GridCylinderSampling(object):
 
     def _process(self, data):
         if not hasattr(data, self.KDTREE_KEY):
-            tree = KDTree(np.asarray(data.pos[:, :-1]), leaf_size=50)
+            tree = cKDTree(np.asarray(data.pos[:, :-1]), leafsize=50)
         else:
             tree = getattr(data, self.KDTREE_KEY)
 
@@ -201,7 +201,7 @@ class GridCylinderSampling(object):
             grid_label = data.y[ind]
 
             # Find neighbours within the original data
-            ind = torch.LongTensor(tree.query_radius(pts, r=self._radius)[0])
+            ind = torch.LongTensor(tree.query_ball_point(pts, r=self._radius)[0])
             sampler = CylinderSampling(self._radius, grid_center, align_origin=self._center)
             new_data = sampler(data)
             new_data.center_label = grid_label
@@ -234,7 +234,7 @@ class ComputeKDTree(object):
         self._leaf_size = leaf_size
 
     def _process(self, data):
-        data.kd_tree = KDTree(np.asarray(data.pos), leaf_size=self._leaf_size)
+        data.kd_tree = cKDTree(np.asarray(data.pos), leafsize=self._leaf_size)
         return data
 
     def __call__(self, data):
@@ -312,13 +312,13 @@ class SphereSampling:
     def __call__(self, data):
         num_points = data.pos.shape[0]
         if not hasattr(data, self.KDTREE_KEY):
-            tree = KDTree(np.asarray(data.pos), leaf_size=50)
+            tree = cKDTree(np.asarray(data.pos), leafsize=50)
             setattr(data, self.KDTREE_KEY, tree)
         else:
             tree = getattr(data, self.KDTREE_KEY)
 
         t_center = torch.FloatTensor(self._centre)
-        ind = torch.LongTensor(tree.query_radius(self._centre, r=self._radius)[0])
+        ind = torch.LongTensor(tree.query_ball_point(self._centre, r=self._radius)[0])
         new_data = Data()
         for key in set(data.keys):
             if key == self.KDTREE_KEY:
@@ -365,14 +365,14 @@ class CylinderSampling:
     def __call__(self, data):
         num_points = data.pos.shape[0]
         if not hasattr(data, self.KDTREE_KEY):
-            tree = KDTree(np.asarray(data.pos[:, :-1]), leaf_size=50)
+            tree = cKDTree(np.asarray(data.pos[:, :-1]), leafsize=50)
             setattr(data, self.KDTREE_KEY, tree)
         else:
             tree = getattr(data, self.KDTREE_KEY)
 
         t_center = torch.FloatTensor(self._centre)
         try:
-            ind = torch.LongTensor(tree.query_radius(self._centre, r=self._radius)[0])
+            ind = torch.LongTensor(tree.query_ball_point(self._centre, r=self._radius)[0])
         except:
             import pdb; pdb.set_trace()
         new_data = Data()
