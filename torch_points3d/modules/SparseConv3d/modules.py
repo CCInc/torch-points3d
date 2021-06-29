@@ -5,6 +5,11 @@ import sys
 from torch_points3d.core.common_modules import Seq, Identity
 import torch_points3d.modules.SparseConv3d.nn as snn
 
+try:
+    from torch_points3d.modules.SPVCNN.utils import initial_voxelize, point_to_voxel, voxel_to_point
+    from torchsparse import PointTensor
+except:
+    print("Can't load torchsparse, SPVCNN modules will be unavailable.")
 
 class ResBlock(torch.nn.Module):
     """
@@ -102,14 +107,11 @@ class ResNetDown(torch.nn.Module):
     CONVOLUTION = "Conv3d"
 
     def __init__(
-        self, down_conv_nn=[], kernel_size=2, dilation=1, stride=2, N=1, block="ResBlock", **kwargs,
+        self, down_conv_nn=[], kernel_size=2, dilation=1, stride=2, N=1, block="ResBlock", skip_feat=[], **kwargs,
     ):
         block = getattr(_res_blocks, block)
         super().__init__()
-        if stride > 1:
-            conv1_output = down_conv_nn[0]
-        else:
-            conv1_output = down_conv_nn[1]
+        conv1_output = down_conv_nn[1]
 
         conv = getattr(snn, self.CONVOLUTION)
         self.conv_in = (
@@ -129,7 +131,10 @@ class ResNetDown(torch.nn.Module):
 
         if N > 0:
             self.blocks = Seq()
-            for _ in range(N):
+            for i, _ in enumerate(range(N)):
+                # add skip connections to 1st res block
+                if i == 0 and skip_feat:
+                    conv1_output += skip_feat
                 self.blocks.append(block(conv1_output, down_conv_nn[1], conv))
                 conv1_output = down_conv_nn[1]
         else:
@@ -149,14 +154,91 @@ class ResNetUp(ResNetDown):
 
     CONVOLUTION = "Conv3dTranspose"
 
-    def __init__(self, up_conv_nn=[], kernel_size=2, dilation=1, stride=2, N=1, **kwargs):
+    def __init__(self, up_conv_nn=[], kernel_size=2, dilation=1, stride=2, N=1, skip_feat=[], dropout=0., **kwargs):        
         super().__init__(
-            down_conv_nn=up_conv_nn, kernel_size=kernel_size, dilation=dilation, stride=stride, N=N, **kwargs,
+            down_conv_nn=up_conv_nn, kernel_size=kernel_size, dilation=dilation, stride=stride, N=N, skip_feat=skip_feat, **kwargs,
         )
+        self.dropout = torch.nn.Dropout(dropout, True)
 
     def forward(self, x, skip):
+        x.F = self.dropout(x.F)
+
+        out = self.conv_in(x)
+
         if skip is not None:
-            inp = snn.cat(x, skip)
+            out = snn.cat(out, skip)  
+
+        if self.blocks:
+            out = self.blocks(out)
+
+        return out
+
+class ResNetDownPV(ResNetDown):
+    def __init__(self, down_conv_nn=[], kernel_size=2, dilation=1, stride=2, N=1, point_nn=None, res=1.0, skip_feat=[], **kwargs):
+        super().__init__(
+            down_conv_nn=down_conv_nn, kernel_size=kernel_size, dilation=dilation, stride=stride, skip_feat=skip_feat, N=N, **kwargs,
+        )
+
+        self.res = res
+        if point_nn is not None:
+            self.point_layer = (
+                Seq()
+                    .append(torch.nn.Linear(point_nn[0], point_nn[1]))
+                    .append(torch.nn.BatchNorm1d(point_nn[1]))
+                    .append(torch.nn.ReLU(True))
+            )
         else:
-            inp = x
-        return super().forward(inp)
+            self.point_layer = None
+
+    def forward(self, x):
+        if not isinstance(x, tuple):
+            pointFeats = PointTensor(x.F, x.C.float())
+            voxelFeats = initial_voxelize(pointFeats, self.res, self.res)
+
+            voxelFeats = self.conv_in(voxelFeats)
+            pointFeats = voxel_to_point(voxelFeats, pointFeats, nearest=False)
+            voxelFeats = point_to_voxel(voxelFeats, pointFeats)
+        else:
+            voxelFeats = x[0]
+            pointFeats = x[1]
+
+            voxelFeats = self.conv_in(voxelFeats)
+
+        if self.blocks:
+            voxelFeats = self.blocks(voxelFeats)
+
+        if self.point_layer:
+            point_out = self.point_layer(pointFeats.F)
+            pointFeats = voxel_to_point(voxelFeats, pointFeats)
+            pointFeats.F = pointFeats.F + point_out
+            voxelFeats = point_to_voxel(voxelFeats, pointFeats)
+
+        return (voxelFeats, pointFeats)
+
+
+class ResNetUpPV(ResNetDownPV):
+    CONVOLUTION = "Conv3dTranspose"
+
+    def __init__(self, up_conv_nn=[], kernel_size=2, dilation=1, stride=2, N=1, point_nn=None, res=1.0, dropout=0.3, skip_feat=[],  **kwargs):
+        # print("up")
+        super().__init__(
+            down_conv_nn=up_conv_nn, kernel_size=kernel_size, dilation=dilation, stride=stride, N=N, point_nn=point_nn, res=res, skip_feat=skip_feat, **kwargs,
+        )
+        self.dropout = torch.nn.Dropout(dropout, True)
+
+    def forward(self, x, skip):
+        voxelFeats = x[0]
+        pointFeats = x[1]
+
+        voxelFeats.F = self.dropout(voxelFeats.F)
+        voxelFeats = self.conv_in(voxelFeats)
+        voxelFeats = snn.cat(voxelFeats, skip[0])
+        voxelFeats = self.blocks(voxelFeats)
+
+        if self.point_layer:
+            point_out = self.point_layer(pointFeats.F)
+            pointFeats = voxel_to_point(voxelFeats, pointFeats)
+            pointFeats.F = pointFeats.F + point_out
+            voxelFeats = point_to_voxel(voxelFeats, pointFeats)
+        
+        return (voxelFeats, pointFeats)
