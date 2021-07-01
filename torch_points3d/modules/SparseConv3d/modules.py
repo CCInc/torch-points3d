@@ -1,15 +1,18 @@
 import torch
 
 import sys
+import logging
 
 from torch_points3d.core.common_modules import Seq, Identity
 import torch_points3d.modules.SparseConv3d.nn as snn
+
+log = logging.getLogger(__name__)
 
 try:
     from torch_points3d.modules.SPVCNN.utils import initial_voxelize, point_to_voxel, voxel_to_point
     from torchsparse import PointTensor
 except:
-    print("Can't load torchsparse, SPVCNN modules will be unavailable.")
+    log.error("Can't load torchsparse, SPVCNN modules will be unavailable.")
 
 class ResBlock(torch.nn.Module):
     """
