@@ -113,7 +113,7 @@ class ResNetDown(torch.nn.Module):
         self, down_conv_nn=[], kernel_size=2, dilation=1, stride=2, N=1, block="ResBlock", **kwargs,
     ):
         block = getattr(_res_blocks, block)
-        super().__init__()        
+        super().__init__()
         if stride > 1:
             conv1_output = down_conv_nn[0]
         else:
@@ -157,7 +157,7 @@ class ResNetUp(torch.nn.Module):
 
     CONVOLUTION = "Conv3dTranspose"
 
-    def __init__(self, up_conv_nn=[], kernel_size=2, dilation=1, stride=2, N=1, skip_feat=None, dropout=0., block="ResBlock", **kwargs):
+    def __init__(self, up_conv_nn=[], kernel_size=2, dilation=1, stride=2, N=1, skip_feat=None, block="ResBlock", **kwargs):
         block = getattr(_res_blocks, block)
         super().__init__()
         conv1_output = up_conv_nn[1]
@@ -188,11 +188,8 @@ class ResNetUp(torch.nn.Module):
                 conv1_output = up_conv_nn[1]
         else:
             self.blocks = None
-        self.dropout = torch.nn.Dropout(dropout, True)
 
     def forward(self, x, skip):
-        x.F = self.dropout(x.F)
-
         out = self.conv_in(x)
 
         if skip is not None:
@@ -250,7 +247,6 @@ class ResNetUpPV(ResNetUp):
     CONVOLUTION = "Conv3dTranspose"
 
     def __init__(self, up_conv_nn=[], kernel_size=2, dilation=1, stride=2, N=1, point_nn=None, res=1.0, dropout=0.3, skip_feat=None,  **kwargs):
-        # print("up")
         super().__init__(
             up_conv_nn=up_conv_nn, kernel_size=kernel_size, dilation=dilation, stride=stride, N=N, point_nn=point_nn, res=res, skip_feat=skip_feat, **kwargs,
         )
