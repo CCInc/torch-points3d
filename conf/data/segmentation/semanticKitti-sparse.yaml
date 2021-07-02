@@ -8,6 +8,7 @@ process_workers: 8
 apply_rotation: True
 mode: "last"
 
+
 train_transform:
   - transform: ElasticDistortion
   - transform: Random3AxisRotation
@@ -25,11 +26,13 @@ train_transform:
       quantize_coords: True
       mode: ${data.mode}
 
+
 val_transform:
   - transform: GridSampling3D
     params:
       size: ${data.first_subsampling}
       quantize_coords: True
       mode: ${data.mode}
+
 
 test_transform: ${data.val_transform}

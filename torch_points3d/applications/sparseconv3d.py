@@ -199,10 +199,13 @@ class SparseConv3dUnet(BaseSparseConv3d):
             stack_down.append(data)
 
         data = self.down_modules[-1](data)
-        stack_down.append(None)
         # TODO : Manage the inner module
         for i in range(len(self.up_modules)):
             data = self.up_modules[i](data, stack_down.pop())
+
+        # todo: change to namedtuple
+        if isinstance(data, tuple):
+            data = data[1]
 
         out = Batch(x=data.F, pos=self.xyz).to(self.device)
         if self.has_mlp_head:

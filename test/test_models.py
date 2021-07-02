@@ -120,7 +120,7 @@ class TestModels(unittest.TestCase):
                 "RSConv_4LD",
                 "RSConv_2LD",
                 "randlanet",
-                "PVCNN",
+                "SPVCNN",
                 "ResUNet32",
             ]
             if not HAS_MINKOWSKI:
