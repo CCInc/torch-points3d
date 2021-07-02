@@ -54,7 +54,7 @@ SPVCNN_Paper:
       stride: [ 2, 2, 2, 2 ]
       dropout: 0.3
 
-ResUNet32:
+SPVCNN_ResUNet32:
   class: sparseconv3d.APIModel
   conv_type: "SPARSE"
   backend: "torchsparse"

@@ -73,7 +73,7 @@ Res16UNet34:
       kernel_size: 3
       stride: [ 2, 2, 2, 2 ]
 
-SPVCNN_Mink:
+SPVCNN_MinkBaseline:
   class: sparseconv3d.APIModel
   conv_type: "SPARSE"
   backend: "torchsparse"
