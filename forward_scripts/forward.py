@@ -58,6 +58,14 @@ def main(cfg):
 
     # Get device
     device = torch.device("cuda" if (torch.cuda.is_available() and cfg.cuda) else "cpu")
+
+
+
+
+
+
+
+
     log.info("DEVICE : {}".format(device))
 
     # Enable CUDNN BACKEND
@@ -79,6 +87,14 @@ def main(cfg):
     if cfg.dataset_config:
         for key, value in cfg.dataset_config.items():
             checkpoint.dataset_properties.update(key, value)
+
+
+
+
+
+
+
+            
 
     # Create dataset and mdoel
     model = checkpoint.create_model(checkpoint.dataset_properties, weight_name=cfg.weight_name)
