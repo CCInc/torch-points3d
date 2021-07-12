@@ -14,7 +14,6 @@ repos:
     rev: stable
     hooks:
       - id: black
-        language_version: python3.7
 
   - repo: https://github.com/humitos/mirrors-autoflake.git
     rev: v1.3
@@ -33,7 +32,7 @@ repos:
       - id: nbstripout
         files: '.ipynb'
 
-  - repo: local
+  - repo: https://github.com/python-poetry/poetry.git
     hooks:
       - id: requirements.txt
         name: Generate requirements.txt
@@ -47,5 +46,5 @@ repos:
             '--without-hashes',
           ]
         pass_filenames: false
-        language: system
+        language: python
         files: 'poetry.lock'
