@@ -37,6 +37,7 @@ repos:
       - id: requirements.txt
         name: Generate requirements.txt
         entry: poetry export
+        rev: v1.1.5
         args:
           [
             '-f',
