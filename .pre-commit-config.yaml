@@ -32,20 +32,7 @@ repos:
       - id: nbstripout
         files: '.ipynb'
 
-  - repo: https://github.com/python-poetry/poetry.git
+  - repo: https://github.com/CCInc/pre-commit-hooks.git
     rev: master
     hooks:
-      - id: requirements.txt
-        name: Generate requirements.txt
-        entry: poetry export
-        args:
-          [
-            '-f',
-            'requirements.txt',
-            '-o',
-            'requirements.txt',
-            '--without-hashes',
-          ]
-        pass_filenames: false
-        language: python
-        files: 'poetry.lock'
+      - id: poetry-generate-requirements
