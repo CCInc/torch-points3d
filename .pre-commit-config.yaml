@@ -2,7 +2,7 @@ exclude: 'benchmark|conf|data|docs|outputs'
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v1.2.3
+    rev: master
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
@@ -33,7 +33,7 @@ repos:
         files: '.ipynb'
 
   - repo: https://github.com/python-poetry/poetry.git
-    rev: v1.1.5
+    rev: master
     hooks:
       - id: requirements.txt
         name: Generate requirements.txt
