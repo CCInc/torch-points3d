@@ -33,11 +33,11 @@ repos:
         files: '.ipynb'
 
   - repo: https://github.com/python-poetry/poetry.git
+    rev: v1.1.5
     hooks:
       - id: requirements.txt
         name: Generate requirements.txt
         entry: poetry export
-        rev: v1.1.5
         args:
           [
             '-f',
