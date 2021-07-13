@@ -96,7 +96,7 @@ class Visualizer(object):
 
     def reset(self, epoch, stage):
         """This function is responsible to restore the visualizer
-            to start a new epoch on a new stage
+        to start a new epoch on a new stage
         """
         self._current_epoch = epoch
         self._seen_batch = 0
@@ -144,9 +144,9 @@ class Visualizer(object):
 
     def save_visuals(self, visuals):
         """This function is responsible to save the data into .ply objects
-            Parameters:
-                visuals (Dict[Data(pos=torch.Tensor, ...)]) -- Contains a dictionnary of tensors
-            Make sure the saved_keys  within the config maps to the Data attributes.
+        Parameters:
+            visuals (Dict[Data(pos=torch.Tensor, ...)]) -- Contains a dictionnary of tensors
+        Make sure the saved_keys  within the config maps to the Data attributes.
         """
         if self._stage in self._indices:
             batch_indices = self._indices[self._stage] // self._batch_size

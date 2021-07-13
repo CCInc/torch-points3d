@@ -56,7 +56,7 @@ class BaseTracker:
         self._append_losses(losses)
 
     def finalise(self, *args, **kwargs):
-        """ Lifcycle method that is called at the end of an epoch. Use this to compute
+        """Lifcycle method that is called at the end of an epoch. Use this to compute
         end of epoch metrics.
         """
         self._finalised = True
@@ -90,7 +90,7 @@ class BaseTracker:
         return new_metrics
 
     def publish(self, step):
-        """ Publishes the current metrics to wandb and tensorboard
+        """Publishes the current metrics to wandb and tensorboard
         Arguments:
             step: current epoch
         """

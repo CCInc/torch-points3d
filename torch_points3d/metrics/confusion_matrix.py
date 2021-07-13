@@ -4,7 +4,7 @@ import os
 
 
 class ConfusionMatrix:
-    """Streaming interface to allow for any source of predictions. 
+    """Streaming interface to allow for any source of predictions.
     Initialize it, count predictions one by one, then print confusion matrix and intersection-union score"""
 
     def __init__(self, number_of_labels=2):
@@ -38,11 +38,11 @@ class ConfusionMatrix:
 
     def get_confusion_matrix(self):
         """returns list of lists of integers; use it as result[ground_truth][predicted]
-            to know how many samples of class ground_truth were reported as class predicted"""
+        to know how many samples of class ground_truth were reported as class predicted"""
         return self.confusion_matrix
 
     def get_intersection_union_per_class(self):
-        """ Computes the intersection over union of each class in the 
+        """Computes the intersection over union of each class in the
         confusion matrix
         Return:
             (iou, missing_class_mask) - iou for class as well as a mask highlighting existing classes
@@ -70,7 +70,7 @@ class ConfusionMatrix:
         return float(matrix_diagonal) / all_values
 
     def get_average_intersection_union(self, missing_as_one=False):
-        """ Get the mIoU metric by ignoring missing labels. 
+        """Get the mIoU metric by ignoring missing labels.
         If missing_as_one is True then treats missing classes in the IoU as 1
         """
         values, existing_classes_mask = self.get_intersection_union_per_class()
