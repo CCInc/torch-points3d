@@ -2,7 +2,6 @@ import os
 import sys
 import numpy as np
 import unittest
-import tempfile
 import h5py
 import numpy.testing as npt
 import numpy.matlib

@@ -158,7 +158,7 @@ bn = sp3d.nn.BatchNorm(10)
 
 ### Mixed Precision Training
 
-Mixed precision allows for lower memory on the GPU and slightly faster training times by performing the sparse convolution, pooling, and gradient ops in `float16`. Mixed precision training is currently supported for CUDA training on `SparseConv3d` networks with the [torchsparse](https://github.com/mit-han-lab/torchsparse) backend. To enable mixed precision, ensure you have the latest version of torchsparse with `pip install --upgrade git+https://github.com/mit-han-lab/torchsparse.git`. Then, set `training.enable_mixed=True` in your training configuration files. If all the conditions are met, when you start training you will see a log entry stating: 
+Mixed precision allows for lower memory on the GPU and slightly faster training times by performing the sparse convolution, pooling, and gradient ops in `float16`. Mixed precision training is currently supported for CUDA training on `SparseConv3d` networks with the [torchsparse](https://github.com/mit-han-lab/torchsparse) backend. To enable mixed precision, ensure you have the latest version of torchsparse with `pip install --upgrade git+https://github.com/mit-han-lab/torchsparse.git`. Then, set `training.enable_mixed=True` in your training configuration files. If all the conditions are met, when you start training you will see a log entry stating:
 
 `[torch_points3d.models.base_model][INFO] - Model will use mixed precision`
 

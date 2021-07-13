@@ -1,19 +1,12 @@
-import numpy as np
-from typing import List
-import shutil
 import matplotlib.pyplot as plt
 import os
-from os import path as osp
-import torch
 import logging
-from collections import namedtuple
 from omegaconf import OmegaConf
 from omegaconf.listconfig import ListConfig
 from omegaconf.dictconfig import DictConfig
 from .enums import ConvolutionFormat
 from torch_points3d.utils.debugging_vars import DEBUGGING_VARS
 from torch_points3d.utils.colors import COLORS, colored_print
-import subprocess
 
 log = logging.getLogger(__name__)
 
@@ -35,7 +28,7 @@ class ConvolutionFormatFactory:
 
 class Option:
     """This class is used to enable accessing arguments as attributes without having OmaConf.
-       It is used along convert_to_base_obj function
+    It is used along convert_to_base_obj function
     """
 
     def __init__(self, opt):
