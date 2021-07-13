@@ -60,9 +60,8 @@ down_conv:
     module_name: KPDualBlock
 innermost:
     module_name: GlobalBaseModule
-    activation: 
+    activation:
         name: LeakyReLU
         negative_slope: 0.2
     aggr: "mean"
     nn: [32 * in_feat + 3, 32 * in_feat]
-

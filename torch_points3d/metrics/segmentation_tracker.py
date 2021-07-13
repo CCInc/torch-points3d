@@ -13,7 +13,7 @@ class SegmentationTracker(BaseTracker):
     def __init__(
         self, dataset, stage="train", wandb_log=False, use_tensorboard: bool = False, ignore_label: int = IGNORE_LABEL
     ):
-        """ This is a generic tracker for segmentation tasks.
+        """This is a generic tracker for segmentation tasks.
         It uses a confusion matrix in the back-end to track results.
         Use the tracker to track an epoch.
         You can use the reset function before you start a new epoch
@@ -57,8 +57,7 @@ class SegmentationTracker(BaseTracker):
         return self._confusion_matrix.confusion_matrix
 
     def track(self, model: model_interface.TrackerInterface, **kwargs):
-        """ Add current model predictions (usually the result of a batch) to the tracking
-        """
+        """Add current model predictions (usually the result of a batch) to the tracking"""
         if not self._dataset.has_labels(self._stage):
             return
 
@@ -91,8 +90,7 @@ class SegmentationTracker(BaseTracker):
         }
 
     def get_metrics(self, verbose=False) -> Dict[str, Any]:
-        """ Returns a dictionnary of all metrics and losses being tracked
-        """
+        """Returns a dictionnary of all metrics and losses being tracked"""
         metrics = super().get_metrics(verbose)
 
         metrics["{}_acc".format(self._stage)] = self._acc
