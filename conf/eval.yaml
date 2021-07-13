@@ -1,4 +1,4 @@
-defaults: 
+defaults:
   - visualization: eval
 
 num_workers: 0
@@ -19,5 +19,3 @@ tracker_options: # Extra options for the tracker
 hydra:
   run:
     dir: ${checkpoint_dir}/eval/${now:%Y-%m-%d_%H-%M-%S}
-
-
